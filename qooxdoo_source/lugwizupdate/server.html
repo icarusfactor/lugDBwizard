@@ -1,0 +1,99 @@
+<?php
+/**
+
+Installation:
+	install this file in
+	
+		${IP}/extensions/lugDBwizard/lugdb.php
+	
+	and add the following line at the end of ${IP}/LocalSettings.php :
+	
+		require_once("$IP/extensions/lugDBwizard/lugdb.php");
+**/
+
+
+define('LUGDBWIZARD_VERSION','0.6');
+
+
+$wgHooks['LanguageGetMagic'][] = 'wfIframeLDBwLanguageGetMagic';
+$wgExtensionFunctions[] = 'wfSetupIframeLDBw';
+
+
+/**
+ * Protect against register_globals vulnerabilities.
+ * This line must be present before any global variable is referenced.
+**/
+if(!defined('MEDIAWIKI')){
+	echo("This is an extension to the MediaWiki package and cannot be run standalone.\n" );
+	die(-1);
+}
+
+
+function wfIframeLDBwLanguageGetMagic(&$magicWords,$langCode = 0) {
+        $magicWords['lugdbwiz'] = array(0,'lugdbwiz');
+        return true;
+}
+ 
+function wfSetupIframeLDBw() {
+        global $wgParser;
+        $wgParser->setFunctionHook('lugdbwiz','wfRenderIframeLDBw');
+        return true;
+}
+
+/**
+ * An array of extension types and inside that their names, versions, authors and urls. This credit information gets added to the wiki's Special:Version page, allowing users to see which extensions are installed, and to find more information about them.
+**/
+$wgExtensionCredits['parserhook'][] = array(
+        'name'          =>      'lugdbwiz',
+        'version'       =>       LUGDBWIZARD_VERSION ,
+        'author'        =>      'Daniel Yount @icarusfactor',
+        'url'           =>      'N/A',
+        'description'   =>      'Creates a secure iframe for a Qooxdoo LUG database'
+);
+
+function wfRenderIframeLDBw( &$parser )
+	{
+        $html='';        
+
+        $argv = array();
+        foreach (func_get_args() as $arg) if (!is_object($arg)) {
+                if (preg_match('/^(.+?)\\s*=\\s*(.+)$/',$arg,$match)) $argv[$match[1]]=$match[2];
+        }
+
+        if(isset($argv['type']))  {  $wiztype  = $argv['type']; } else   { $wiztype = 'add'; }; 
+        if(isset($argv['width'] ))  {  $width  = $argv['width' ]; } else { $width  = 475; }; 
+        if(isset($argv['height']))  {  $height = $argv['height']; } else { $height = 712; };
+        $scrolling='no';
+
+        //This will be the url to the php HTML segment to embed in the iframe. Variables will be added dynamically.  
+        if( $wiztype == 'add')
+         {  $url= "http://www.userspace.org/extensions/lugDBwizard/wizard_add/lugdbapp.php";}
+        else 
+         {  $url= "http://www.userspace.org/extensions/lugDBwizard/wizard_update/lugdbapp.php"; }
+
+       $data = array( 'search'=>$searchterms  ,  'width'=>$width ,  'height'=>$height  );
+
+       $uquery = http_build_query($data,'','&');
+     
+       $urlquery = $url.'?'.$uquery;
+
+       $html .='<script>function loadlugDBadd() {document.getElementById("lugDBframe").src="http://www.userspace.org/extensions/lugDBwizard/wizard_add/lugdbapp.php?'.$uquery.'";}';
+
+         
+       $html .='function loadlugDBupdate() {document.getElementById("lugDBframe").src="http://www.userspace.org/extensions/lugDBwizard/wizard_update/lugdbapp.php?'.$uquery.'";}<script>';
+
+
+       $html .= '<iframe id="lugDBframe" height='.$height.' width='.$width.' frameborder=0 scrolling="'.$scrolling.'" src ="'.$urlquery.'" ></iframe>';  
+
+       return $parser->insertStripItem( $html, $parser->mStripState );  
+  
+         
+	}
+
+?>
+
+
+
+
+
+
