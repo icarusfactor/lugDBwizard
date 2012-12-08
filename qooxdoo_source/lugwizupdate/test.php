@@ -24,10 +24,10 @@ echo " ";
 echo $output['ugh'];
 
 
-$username="b15_10061641";
-$password="g1l2u3e4";
-$database="b15_10061641_userspace";
-$server="sql207.byethost15.com";
+$username="";
+$password="";
+$database="";
+$server="";
 
 
 
