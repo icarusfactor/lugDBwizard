@@ -6,10 +6,10 @@ parse_str( $_SERVER['QUERY_STRING'] , $output );
 ////echo $output['ugn'];
 ////echo " "; 
 
-//$username="b15_10061641";
-//$password="g1l2u3e4";
-//$database="b15_10061641_userspace";
-//$server="sql207.byethost15.com";
+//$username="";
+//$password="";
+//$database="";
+//$server="";
 
 //mysql_connect( $server,$username,$password);
 
